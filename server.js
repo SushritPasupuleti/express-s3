@@ -23,8 +23,8 @@ var upload = multer({
         bucket: process.env.AWSBucketName,
         key: function (req, file, cb) {
             console.log(file);
-            cb(null, file.originalname + Date.now()); //use Date.now() for unique file keys
-        }
+            cb(null, file.originalname + Date.now()) //use Date.now() for unique file keys
+        },
     })
 });
 
@@ -35,7 +35,7 @@ app.get('/', function (req, res) {
 
 //use by upload form
 app.post('/upload', upload.single('file'), function (req, res, next) {
-    res.send("Uploaded!");
+    res.send("Uploaded!, file can be accessed from: " + req.file.location);
 });
 
 app.listen(3000, function () {
