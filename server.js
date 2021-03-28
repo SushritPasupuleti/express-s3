@@ -23,7 +23,7 @@ var upload = multer({
         bucket: process.env.AWSBucketName,
         key: function (req, file, cb) {
             console.log(file);
-            cb(null, file.originalname); //use Date.now() for unique file keys
+            cb(null, file.originalname + Date.now()); //use Date.now() for unique file keys
         }
     })
 });
