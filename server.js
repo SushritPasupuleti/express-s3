@@ -1,32 +1,43 @@
 require('dotenv').config()
 
-const express = require('express');
-const app = express();
-const multer = require('multer');
-const multerS3 = require('multer-s3');
-const AWS = require('aws-sdk');
+var express = require('express'),
+    aws = require('aws-sdk'),
+    bodyParser = require('body-parser'),
+    multer = require('multer'),
+    multerS3 = require('multer-s3');
 
-const s3 = new AWS.S3({
-    accessKeyId: process.env.accessKeyId,
-    secretAccessKey: process.env.secretAccessKey,
+aws.config.update({
+    accessKeyId: process.env.AWSAccessKeyId,
+    secretAccessKey: process.env.AWSSecretKey,
+    region: 'ap-south-1'
 });
 
-const uploadS3 = multer({
+var app = express(),
+    s3 = new aws.S3();
+
+app.use(bodyParser.json());
+
+var upload = multer({
     storage: multerS3({
         s3: s3,
-        acl: 'public-read',
         bucket: process.env.AWSBucketName,
-        metadata: (req, file, cb) => {
-            cb(null, { fieldName: file.fieldname })
-        },
-        key: (req, file, cb) => {
-            cb(null, Date.now().toString() + '-' + file.originalname)
+        key: function (req, file, cb) {
+            console.log(file);
+            cb(null, file.originalname); //use Date.now() for unique file keys
         }
     })
 });
 
-app.post('/upload', uploadS3.single('file'), (req, res) => {
-    console.log(req.file);
+//open in browser to see upload form
+app.get('/', function (req, res) {
+    res.sendFile(__dirname + '/index.html');//index.html is inside node-cheat
 });
 
-app.listen(process.env.PORT || 3000);
+//use by upload form
+app.post('/upload', upload.single('file'), function (req, res, next) {
+    res.send("Uploaded!");
+});
+
+app.listen(3000, function () {
+    console.log('Example app listening on port 3000!');
+});
