@@ -35,9 +35,24 @@ app.get('/', function (req, res) {
 
 //use by upload form
 app.post('/upload', upload.single('file'), function (req, res, next) {
-    res.send("Uploaded!, file can be accessed from: " + req.file.location);
+    res.send({
+        success: 1,
+        file: {
+            url: req.file.location
+        }
+    });
 });
 
-app.listen(3000, function () {
-    console.log('Example app listening on port 3000!');
+///ignore this is for editorjs upload endpoint
+app.post('/upload-img', upload.single('image'), function (req, res, next) {
+    res.send({
+        success: 1,
+        file: {
+            url: req.file.location
+        }
+    });
+});
+
+app.listen(5000, function () {
+    console.log('Server listening on port 5000!');
 });
